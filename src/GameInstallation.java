@@ -1,15 +1,18 @@
 import java.io.*;
 import java.util.Arrays;
 import java.util.List;
+import java.io.*;
+import java.util.Arrays;
+import java.util.List;
 
 public class GameInstallation {
+	private static StringBuilder log = new StringBuilder();
+
 	public static void main(String[] args) {
 		File gamesDir = new File("C:\\Users\\Alex\\Desktop\\Games");
 
 		if (!gamesDir.exists())
 			gamesDir.mkdirs();
-
-		StringBuilder log = new StringBuilder();
 
 		List<String> directoriesToCreate = Arrays.asList(
 				"src",
@@ -24,29 +27,31 @@ public class GameInstallation {
 		);
 
 		for (String dir : directoriesToCreate) {
-			log.append(createDirectory(gamesDir, dir));
+			createDirectory(gamesDir, dir);
 		}
 
 		log.append(createFile(new File(gamesDir, "src/main"), "Main.java"));
 		log.append(createFile(new File(gamesDir, "src/main"), "Utils.java"));
 
 		File tempDir = new File(gamesDir, "temp");
+		tempDir.mkdirs();
 		File tempFile = new File(tempDir, "temp.txt");
 		log.append(createFile(tempDir, "temp.txt"));
 
-		writeLogToFile(tempFile, log.toString());
+		writeLogToFile(tempFile);
 	}
 
-	private static String createDirectory(File parentDir, String dirName) {
+	private static void createDirectory(File parentDir, String dirName) {
 		File dir = new File(parentDir, dirName);
 		if (!dir.exists()) {
 			if (dir.mkdir()) {
-				return "Директория " + dirName + " успешно создана\n";
+				log.append("Директория " + dirName + " успешно создана\n");
 			} else {
-				return "Ошибка при создании директории " + dirName + "\n";
+				log.append("Ошибка при создании директории " + dirName + "\n");
 			}
+		} else {
+			log.append("Директория " + dirName + " уже существует\n");
 		}
-		return "Директория " + dirName + " уже существует\n";
 	}
 
 	private static String createFile(File parentDir, String fileName) {
@@ -58,17 +63,18 @@ public class GameInstallation {
 				} else {
 					return "Ошибка при создании файла " + fileName + "\n";
 				}
+			} else {
+				return "Файл " + fileName + " уже существует\n";
 			}
-			return "Файл " + fileName + " уже существует\n";
 		} catch (IOException e) {
 			e.printStackTrace();
 			return "Ошибка при создании файла " + fileName + "\n";
 		}
 	}
 
-	private static void writeLogToFile(File file, String log) {
+	private static void writeLogToFile(File file) {
 		try (FileWriter writer = new FileWriter(file)) {
-			writer.write(log);
+			writer.write(log.toString());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
